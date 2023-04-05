@@ -9,30 +9,46 @@ public class taptoplace : MonoBehaviour
 {
     [SerializeField] Text debugText;
     [SerializeField] ARRaycastManager arRaycastManager;
-    List<ARRaycastHit> hits= new List<ARRaycastHit>();
+    List<ARRaycastHit> hits = new List<ARRaycastHit>();
     Vector2 touchPosition;
+    [SerializeField] GameObject portalPrefab;
+    Transform planePos;
+    [SerializeField] ARPlaneManager planeManager;
+    bool portalSpawned = false;
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Start");
-        debugText.text = "application launched";
+        //Debug.Log("Start");
+        //debugText.text = "application launched";
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.touchCount > 0)
+        if (!portalSpawned)
         {
+            if (Input.touchCount > 0)
+            {
 
-        touchPosition = Input.GetTouch(0).position;
-        Debug.Log(touchPosition);
-        debugText.text= touchPosition.ToString();
-        if(arRaycastManager.Raycast(touchPosition,hits,TrackableType.PlaneWithinPolygon))
-        {
-            debugText.text = "true";
-        }
+                touchPosition = Input.GetTouch(0).position;
+                //Debug.Log(touchPosition);
+                //debugText.text= touchPosition.ToString();
+                if (arRaycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinPolygon))
+                {
+                    planePos = GameObject.FindObjectOfType<ARPlane>().transform;
+                    Instantiate(portalPrefab, planePos.position, planePos.rotation);
+                    portalSpawned = true;
+                    planeManager.SetTrackablesActive(false);
+                    planeManager.enabled = false;
+                    //debugText.text = "true";
+                }
+                else
+                {
+                    //debugText.text = "false";
+                }
+            }
         }
 
-        
+
     }
 }
